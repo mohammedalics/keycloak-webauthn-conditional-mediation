@@ -105,8 +105,9 @@
             </div>
         </div>
     <script type="text/javascript" src="${url.resourcesCommonPath}/node_modules/jquery/dist/jquery.min.js"></script>
-    <script type="text/javascript" src="${url.resourcesPath}/js/base64url.js"></script>
-    <script type="text/javascript">
+    <script type="module">
+        import { base64url } from "${url.resourcesCommonPath}/node_modules/rfc4648/lib/rfc4648.js";
+
         const authnOptions = {
             challenge : "${challenge}",
             rpId : "${rpId}",
@@ -136,7 +137,7 @@
                     document.getElementById("kc-form-buttons-webauthn").style.display = 'block';
                 }
             }
-        }    
+        }
 
         const getAllowCredentials = () => {
             let allowCredentials = [];
@@ -144,13 +145,13 @@
             if (authn_use !== undefined) {                
                 if (authn_use.length === undefined) {
                     allowCredentials.push({
-                        id: base64url.decode(authn_use.value, {loose: true}),
+                        id: base64url.parse(authn_use.value, {loose: true}),
                         type: 'public-key',
                     });
                 } else {
                     for (let i = 0; i < authn_use.length; i++) {
                         allowCredentials.push({
-                            id: base64url.decode(authn_use[i].value, {loose: true}),
+                            id: base64url.parse(authn_use[i].value, {loose: true}),
                             type: 'public-key',
                         });
                     }
@@ -162,7 +163,7 @@
         const getPublicKeyRequestOptions = () => {
             let publicKeyReqOptions = {};
             publicKeyReqOptions.rpId = authnOptions.rpId;
-            publicKeyReqOptions.challenge = base64url.decode(authnOptions.challenge, { loose: true });
+            publicKeyReqOptions.challenge = base64url.parse(authnOptions.challenge, { loose: true });
             publicKeyReqOptions.allowCredentials = !authnOptions.isUserIdentified ? [] : getAllowCredentials();
 
             if(authnOptions.createTimeout !== 0) publicKeyReqOptions.timeout = authnOptions.createTimeout * 1000;
@@ -199,7 +200,7 @@
         }
 
         const encodeBase64AsUint8Array = (value) => {
-            return base64url.encode(new Uint8Array(value), { pad: false });
+            return base64url.stringify(new Uint8Array(value), { pad: false });
         }
 
     </script>
